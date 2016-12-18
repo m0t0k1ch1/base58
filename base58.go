@@ -123,7 +123,6 @@ func (b58 *Base58) DecodeString(s string) ([]byte, error) {
 	}
 
 	n := zero
-
 	for _, srcByte := range srcBytes[startIdx:] {
 		charIdx, ok := b58.charIdxMap[srcByte]
 		if !ok {
