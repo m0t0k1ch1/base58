@@ -26,6 +26,7 @@ var (
 	}
 	decodeTestCasesBitcoin = []decodeTestCase{
 		{"", "", nil},
+		{"0", "", ErrInvalidChar},
 		{"1", "00", nil},
 		{"16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM", "00010966776006953d5567439e5e39f86a0d273beed61967f6", nil},
 	}
