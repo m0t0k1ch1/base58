@@ -12,11 +12,6 @@ const (
 )
 
 var (
-	div  = big.NewInt(Base)
-	zero = big.NewInt(0)
-)
-
-var (
 	ErrInvalidLengthBytes = errors.New("invalid length bytes")
 	ErrInvalidChar        = errors.New("invalid char")
 )
@@ -85,6 +80,8 @@ func (b58 *Base58) EncodeToString(srcBytes []byte) (string, error) {
 		}
 	}
 
+	zero := big.NewInt(0)
+	div := big.NewInt(Base)
 	mod := &big.Int{}
 
 	tmpBuf := &bytes.Buffer{}
@@ -108,7 +105,7 @@ func (b58 *Base58) EncodeToString(srcBytes []byte) (string, error) {
 func (b58 *Base58) DecodeString(s string) ([]byte, error) {
 	srcBytes := []byte(s)
 
-	var startIdx int64
+	startIdx := 0
 
 	zeroBuf := &bytes.Buffer{}
 	for i, srcByte := range srcBytes {
@@ -117,12 +114,14 @@ func (b58 *Base58) DecodeString(s string) ([]byte, error) {
 				return nil, err
 			}
 		} else {
-			startIdx = int64(i)
+			startIdx = i
 			break
 		}
 	}
 
-	n := zero
+	n := big.NewInt(0)
+	div := big.NewInt(Base)
+
 	for _, srcByte := range srcBytes[startIdx:] {
 		charIdx, ok := b58.charIdxMap[srcByte]
 		if !ok {
