@@ -21,14 +21,14 @@ type Base58 struct {
 	charIdxMap map[byte]int64
 }
 
-func NewBase58(s string) (*Base58, error) {
+func NewBase58(charsStr string) (*Base58, error) {
 	b58 := &Base58{}
 
-	if err := b58.initChars(s); err != nil {
+	if err := b58.initChars(charsStr); err != nil {
 		return nil, err
 	}
 
-	if err := b58.initCharIdxMap(s); err != nil {
+	if err := b58.initCharIdxMap(charsStr); err != nil {
 		return nil, err
 	}
 
@@ -41,37 +41,37 @@ func NewBitcoinBase58() *Base58 {
 	return b58
 }
 
-func (b58 *Base58) initChars(s string) error {
-	if len(s) != 58 {
+func (b58 *Base58) initChars(charsStr string) error {
+	if len(charsStr) != 58 {
 		return ErrInvalidLengthBytes
 	}
 
-	chars := []byte(s)
+	chars := []byte(charsStr)
 	copy(b58.chars[:], chars[:])
 
 	return nil
 }
 
-func (b58 *Base58) initCharIdxMap(s string) error {
-	if len(s) != 58 {
+func (b58 *Base58) initCharIdxMap(charsStr string) error {
+	if len(charsStr) != 58 {
 		return ErrInvalidLengthBytes
 	}
 
 	b58.charIdxMap = map[byte]int64{}
-	for i, b := range []byte(s) {
+	for i, b := range []byte(charsStr) {
 		b58.charIdxMap[b] = int64(i)
 	}
 
 	return nil
 }
 
-func (b58 *Base58) EncodeToString(srcBytes []byte) (string, error) {
+func (b58 *Base58) EncodeToString(b []byte) (string, error) {
 	n := &big.Int{}
-	n.SetBytes(srcBytes)
+	n.SetBytes(b)
 
 	buf := &bytes.Buffer{}
-	for _, srcByte := range srcBytes {
-		if srcByte == 0x00 {
+	for _, c := range b {
+		if c == 0x00 {
 			if err := buf.WriteByte(b58.chars[0]); err != nil {
 				return "", err
 			}
@@ -102,12 +102,12 @@ func (b58 *Base58) EncodeToString(srcBytes []byte) (string, error) {
 }
 
 func (b58 *Base58) DecodeString(s string) ([]byte, error) {
-	srcBytes := []byte(s)
+	b := []byte(s)
 
 	startIdx := 0
 	buf := &bytes.Buffer{}
-	for i, srcByte := range srcBytes {
-		if srcByte == b58.chars[0] {
+	for i, c := range b {
+		if c == b58.chars[0] {
 			if err := buf.WriteByte(0x00); err != nil {
 				return nil, err
 			}
@@ -120,8 +120,8 @@ func (b58 *Base58) DecodeString(s string) ([]byte, error) {
 	n := big.NewInt(0)
 	div := big.NewInt(Base)
 
-	for _, srcByte := range srcBytes[startIdx:] {
-		charIdx, ok := b58.charIdxMap[srcByte]
+	for _, c := range b[startIdx:] {
+		charIdx, ok := b58.charIdxMap[c]
 		if !ok {
 			return nil, ErrInvalidChar
 		}
