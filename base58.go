@@ -88,9 +88,8 @@ func (b58 *Base58) EncodeToString(srcBytes []byte) (string, error) {
 	for {
 		if n.Cmp(zero) == 0 {
 			tmpBytes := tmpBuf.Bytes()
-			tmpBytesLen := len(tmpBytes)
-			for i := 1; i <= tmpBytesLen; i++ {
-				buf.WriteByte(tmpBytes[tmpBytesLen-i])
+			for i := len(tmpBytes) - 1; i >= 0; i-- {
+				buf.WriteByte(tmpBytes[i])
 			}
 			return buf.String(), nil
 		}
