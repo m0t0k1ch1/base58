@@ -88,9 +88,8 @@ func (b58 *Base58) EncodeToString(srcBytes []byte) (string, error) {
 	for {
 		if n.Cmp(zero) == 0 {
 			tmpBytes := tmpBuf.Bytes()
-			tmpBytesLen := len(tmpBytes)
-			for i := 1; i <= tmpBytesLen; i++ {
-				buf.WriteByte(tmpBytes[tmpBytesLen-i])
+			for i := len(tmpBytes) - 1; i >= 0; i-- {
+				buf.WriteByte(tmpBytes[i])
 			}
 			return buf.String(), nil
 		}
@@ -106,11 +105,10 @@ func (b58 *Base58) DecodeString(s string) ([]byte, error) {
 	srcBytes := []byte(s)
 
 	startIdx := 0
-
-	zeroBuf := &bytes.Buffer{}
+	buf := &bytes.Buffer{}
 	for i, srcByte := range srcBytes {
 		if srcByte == b58.chars[0] {
-			if err := zeroBuf.WriteByte(0x00); err != nil {
+			if err := buf.WriteByte(0x00); err != nil {
 				return nil, err
 			}
 		} else {
@@ -131,5 +129,7 @@ func (b58 *Base58) DecodeString(s string) ([]byte, error) {
 		n.Add(n.Mul(n, div), big.NewInt(charIdx))
 	}
 
-	return append(zeroBuf.Bytes(), n.Bytes()...), nil
+	buf.Write(n.Bytes())
+
+	return buf.Bytes(), nil
 }
